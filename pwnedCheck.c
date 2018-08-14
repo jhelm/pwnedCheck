@@ -2,7 +2,7 @@
 /* V 0.0.0 - John Helm, 12 Aug 2018                                           */
 /* Pleae see pwned.h for license                                              */
 /*                                                                            */
-/* Checks if password passed in argv[1] or stding is in the pwned password    */
+/* Checks if password passed in argv[1] or stdin is in the pwned password     */
 /* file using a binary search of the disk file                                */
 /*                                                                            */
 /* Usage:                                                                     */
@@ -41,7 +41,8 @@ int main(int argc, char *argv[])
 
  if (argc < 1) {
      fprintf(stderr,"No arguments?");
-     exit(-2);
+     helpMsg();
+     exit(-1);
      }
  else {
      strcpy(pwFileSpec,PWNED_DIR);                    /* default dir for      */
@@ -88,7 +89,7 @@ int main(int argc, char *argv[])
 
  if (errorFlag) {
      helpMsg();
-     exit(-1);
+     exit(-2);
      }
 
  if (strlen(pwHash) == 0) {
@@ -101,7 +102,7 @@ int main(int argc, char *argv[])
 
  if (0 > (pwnedFileNo = open(pwFileSpec,O_RDONLY))) {
      fprintf(stderr,"Failed to open \"%s\" as the pwned file.\n",pwFileSpec);
-     exit(-1);
+     exit(-3);
      }
 
  /* everything looks good, so do the binary search */
@@ -110,7 +111,7 @@ int main(int argc, char *argv[])
 
  if (fileByte == -1) {
      fprintf(stderr,"Problem reading %s, sorry....\n",pwFileSpec);
-     exit(-1);
+     exit(-4);
      }
 
  if (fileByte < 0) { 
