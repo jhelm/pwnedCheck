@@ -1,0 +1,19 @@
+# Tools files (emacs, finder, ...)
+#*
+*~
+*#
+\#*
+.DS_Store
+.#*
+
+# C extensions
+*.o
+*.so
+
+# Local Cruft
+*.dSYM
+
+
+# Executables
+
+
