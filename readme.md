@@ -39,7 +39,7 @@ one's passwords locally. The file is available via
 [bittorrent](https://downloads.pwnedpasswords.com/passwords/pwned-passwords-ordered-by-hash.7z.torrent)
 or (less desirably) as a direct download. For people familiar with
 Unix, the following bash command provides one way to check a
-password (where the pwned file is `./pwned-passwords-ordered-by-hash.txt`:
+password (where the pwned file is `./pwned-passwords-ordered-by-hash.txt`):
 
 ```
 export TSTPWD=`echo -n "123456" | openssl sha1 | awk '{ print toupper($1) }'` && fgrep $TSTPWD ./pwned-passwords-ordered-by-hash.txt
@@ -88,8 +88,8 @@ in the OS X 10.13.6 command line environment (i.e. without Xcode) and
 has not been tested elsewhere.
 
 - [ ] Download the pwned-passwords-ordered-by-hash.txt from [here](https://downloads.pwnedpasswords.com/passwords/pwned-passwords-ordered-by-hash.7z.torrent)
-- [ ] Pull this repo.
-- [ ] \(Optional) If desired, edit the Makefile to chage the PWNED_DATA variable for your default pwned datafile filespec.
+- [ ] Pull this repo
+- [ ] \(Optional) If desired, edit the Makefile to chage the PWNED_DATA variable for your default pwned datafile filespec
 - [ ] \(Optional) If desired, edit the Makefile to change the INST_BIN variable for your default directory for executables
 - [ ] Run make
 - [ ] Run make install
