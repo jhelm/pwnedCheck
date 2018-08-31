@@ -1,21 +1,21 @@
+/* #define BSEARCH_DEBUG  1 */
 /* pwnedCheck.c                                                               */
-/* V 0.0.0 - John Helm, 12 Aug 2018                                           */
+/* V 0.1.0 - John Helm                                                        */
 /* Pleae see pwned.h for license                                              */
 /*                                                                            */
-/* Checks if password passed in argv[1] or stdin is in the pwned password     */
-/* file using a binary search of the disk file                                */
+/* Checks if password passed in argv[1] is in the pwned password file         */
+/* using a binary search of the disk file                                     */
 /*                                                                            */
 /* Usage:                                                                     */
-/*     pwnedCheck [-q] [-p pwnedFileSpec] [password]                          */
-/*     pwnedCheck [-q] [-p pwnedFileSpec] [-s [SHA1_hash]]                    */
+/*     pwnedCheck [-q] [-p pwnedFileSpec] "password"                          */
+/*     pwnedCheck [-q] [-p pwnedFileSpec] -s "SHA1_hash"                      */
 /*                                                                            */
 /* where:                                                                     */
-/*     -t is terse mode, only the occurance count written to stdout           */
-/*     -p is a filespec for the pwned file, the default is:                   */
+/*     -t is terse mode, only occurance count written to stdout               */
+/*     -p is filespec for pwned file, the default is                          */
 /*        ./pwned-passwords-ordered-by-hash.txt                               */
 /*                                                                            */
-/* if "password" or "SHA1_hash" is omitted from the command line, pwnedCheck  */
-/* reads it from stdin                                                        */
+/* if "password" or "SHA1_hash" is omitted, pwnedCheck reads from stdin       */
 /*                                                                            */
 /* return codes:                                                              */
 /*     < 0 indicates error                                                    */
@@ -25,7 +25,35 @@
 /* Requires pwned-passwords-ordered-by-hash.txt be uncompressed.              */
 
 
-#include    "pwnedCheck.h"
+#define     PWNED_DIR            "./" 
+#define     PWNED_FILENAME       "pwned-passwords-ordered-by-hash.txt" 
+#define     FILE_NAME_MAX_SIZE   256
+#define     FILE_BUFFER_SIZE     256             /* being lazy here...        */
+#define     HASH_BUFFER_SIZE     256
+#define     SHA1_SIZE             40
+
+#include    <assert.h>                           /* for compile time checking */
+#define static_assert _Static_assert
+#include    <sys/types.h>
+static_assert( sizeof(off_t) == 8, "This program must be compiled for 64 POSIX machines" );
+
+#include    <stdio.h>
+#include    <stdlib.h>
+#include    <stdbool.h>
+#include    <string.h>
+#include    <stddef.h>
+#include    <ctype.h>
+#include    <fcntl.h>
+#include    <unistd.h>
+#include    <sys/stat.h>
+#include    "sha1.h"
+
+off_t          fileSizeGet   (int fileNo, struct stat *st, char *fileName);
+off_t          binFileSearch (int fileNo, char *key, off_t fPosL, off_t fPosR, char brkChar, char eorChar); 
+char          *getPwnedFspec (char *pwFileSpec, char *arg, char *pwPathDefault);
+bool           parseArgs(int argc, char *argv[], bool *terseFlag, bool *sha1Flag, char *pwFileSpec, char* pwText);
+bool           pswd2sha1(char *pswd, char *pwText);
+void           helpMsg       (void);
 
 int main(int argc, char *argv[])
  {
@@ -39,16 +67,15 @@ int main(int argc, char *argv[])
  bool           terseFlag=false, errorFlag=false, sha1Flag=false;
  struct stat    st;
 
- if (argc < 1) {
-     fprintf(stderr,"No arguments?");
-     helpMsg();
-     exit(-1);
+ strcpy(pwFileSpec,PWNED_DIR);                    /* default dir for      */
+ strcat(pwFileSpec,PWNED_FILENAME);               /* defaut pwnedFileSpec */
+ errorFlag = parseArgs(argc, argv, &terseFlag, &sha1Flag, pwFileSpec, pwText);
+
+ if (strlen(pwText) == 0) {
+     fprintf(stderr, "No argument provided.\n");
+     errorFlag = true;
      }
- else {
-     strcpy(pwFileSpec,PWNED_DIR);                    /* default dir for      */
-     strcat(pwFileSpec,PWNED_FILENAME);               /* defaut pwnedFileSpec */
-     errorFlag = parseArgs(argc, argv, &terseFlag, &sha1Flag, pwFileSpec, pwText);
-     }
+     
 
  if (!errorFlag) {
      if (sha1Flag) {
@@ -89,7 +116,7 @@ int main(int argc, char *argv[])
 
  if (errorFlag) {
      helpMsg();
-     exit(-2);
+     exit(-1);
      }
 
  if (strlen(pwHash) == 0) {
@@ -102,7 +129,7 @@ int main(int argc, char *argv[])
 
  if (0 > (pwnedFileNo = open(pwFileSpec,O_RDONLY))) {
      fprintf(stderr,"Failed to open \"%s\" as the pwned file.\n",pwFileSpec);
-     exit(-3);
+     exit(-1);
      }
 
  /* everything looks good, so do the binary search */
@@ -111,7 +138,7 @@ int main(int argc, char *argv[])
 
  if (fileByte == -1) {
      fprintf(stderr,"Problem reading %s, sorry....\n",pwFileSpec);
-     exit(-4);
+     exit(-1);
      }
 
  if (fileByte < 0) { 
@@ -164,8 +191,10 @@ char *getPwnedFspec(char *pwFileSpec, char *arg, char *pwPathDefault)
  return pwFileSpec;
  }
 
+
+
 /* binFileSearch
- * V 1.0.1 - John Helm, Apr 2004
+ * V 1.0.1 - John Helm, Apr 2003
  * 
  * Uses POSIX I/O to perform binary search on TEXT file with records formatted 
  * as <recordID || fDelim || recordData>, and sorted by recordID in ascending order. 
@@ -248,6 +277,7 @@ off_t fileSizeGet(int fileNo, struct stat *st, char *fileName)
 
 void helpMsg()
  {
+ fprintf(stderr,"\npwnedCheck V 0.1.0 (2018-08-31)\n\n");
  fprintf(stderr,"Usage:\n");
  fprintf(stderr,"    pwnedCheck [-q] [-p pwnedFileSpec] \"password\"\n");
  fprintf(stderr,"    pwnedCheck [-q] [-p pwnedFileSpec] -s \"SHA1_hash\"\n");
