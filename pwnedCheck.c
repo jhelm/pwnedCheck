@@ -172,7 +172,7 @@ char *getPwnedFspec(char *pwFileSpec, char *arg, char *pwPathDefault)
  * 
  * Returns byte offset if found, else 
  * returns   -1        if file error, else
- * returns < -1        if not find.
+ * returns < -1        if not found
  * 
  */
 off_t binFileSearch (int fileNo, char *key, off_t fPosL, off_t fPosR, char fDelim, char eorChar)
