@@ -86,5 +86,4 @@ bool           parseArgs(int argc, char *argv[], bool *terseFlag, bool *sha1Flag
 bool           pswd2sha1(char *pswd, char *pwText);
 void           helpMsg       (void);
 
-
 #endif

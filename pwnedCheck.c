@@ -24,36 +24,7 @@
 /*                                                                            */
 /* Requires pwned-passwords-ordered-by-hash.txt be uncompressed.              */
 
-
-#define     PWNED_DIR            "./" 
-#define     PWNED_FILENAME       "pwned-passwords-ordered-by-hash.txt" 
-#define     FILE_NAME_MAX_SIZE   256
-#define     FILE_BUFFER_SIZE     256             /* being lazy here...        */
-#define     HASH_BUFFER_SIZE     256
-#define     SHA1_SIZE             40
-
-#include    <assert.h>                           /* for compile time checking */
-#define static_assert _Static_assert
-#include    <sys/types.h>
-static_assert( sizeof(off_t) == 8, "This program must be compiled for 64 POSIX machines" );
-
-#include    <stdio.h>
-#include    <stdlib.h>
-#include    <stdbool.h>
-#include    <string.h>
-#include    <stddef.h>
-#include    <ctype.h>
-#include    <fcntl.h>
-#include    <unistd.h>
-#include    <sys/stat.h>
-#include    "sha1.h"
-
-off_t          fileSizeGet   (int fileNo, struct stat *st, char *fileName);
-off_t          binFileSearch (int fileNo, char *key, off_t fPosL, off_t fPosR, char brkChar, char eorChar); 
-char          *getPwnedFspec (char *pwFileSpec, char *arg, char *pwPathDefault);
-bool           parseArgs(int argc, char *argv[], bool *terseFlag, bool *sha1Flag, char *pwFileSpec, char* pwText);
-bool           pswd2sha1(char *pswd, char *pwText);
-void           helpMsg       (void);
+#include    "pwnedCheck.h"
 
 int main(int argc, char *argv[])
  {
