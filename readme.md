@@ -6,7 +6,7 @@ password file.
 
 While the presence of a password does not mean your account has been
 compromised, prudence dictates the password be changed
-anyway. Ironically, the stornger the found password is, the more likely
+anyway. Ironically, the stronger the found password is, the more likely
 the compromised credentials are yours. Bottom line: passwords
 appearing in this file should be changed.
 
